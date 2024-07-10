@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import EmployeeDetails from "./EmployeeDetails";
 
 const EmployeeList = () => {
   const [employees, setEmployees] = useState([]);
@@ -12,6 +13,7 @@ const EmployeeList = () => {
   });
   const [editingId, setEditingId] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
 
   const fetchEmployees = async () => {
     const result = await axios.get("http://localhost:5000/api/employees");
@@ -111,11 +113,18 @@ const EmployeeList = () => {
           </button>
         </form>
       </div>
+      {selectedEmployee && (
+        <EmployeeDetails
+          employeeId={selectedEmployee.id}
+          onClose={() => setSelectedEmployee(null)}
+        />
+      )}
       <List
         employees={sortedEmployees}
         input={inputText}
         onEdit={handleEditEmployee}
         onDeactivate={handleDeactivateEmployee}
+        onSelect={setSelectedEmployee}
         handleSort={handleSort}
         sortConfig={sortConfig}
       />
@@ -123,7 +132,7 @@ const EmployeeList = () => {
   );
 };
 
-function List({ employees, input, onEdit, onDeactivate, handleSort, sortConfig }) {
+function List({ employees, input, onEdit, onDeactivate, onSelect, handleSort, sortConfig }) {
   const filterData = employees.filter((employee) => {
     if (input === "") {
       return true;
@@ -160,6 +169,7 @@ function List({ employees, input, onEdit, onDeactivate, handleSort, sortConfig }
               <td>
                 <button onClick={() => onEdit(employee)}>Edit</button>
                 <button onClick={() => onDeactivate(employee.id)}>Deactivate</button>
+                <button onClick={() => onSelect(employee)}>View Details</button>
               </td>
             </tr>
           ))}

@@ -25,15 +25,20 @@ CREATE TABLE approval_requests (
     status VARCHAR(50) NOT NULL DEFAULT 'New',
     comment TEXT
 );
+insert into projects(id, name, description) values(1,'Out of office app', 'An out of office app solution');
 
 CREATE TABLE projects (
-    id SERIAL PRIMARY KEY,
-    project_type VARCHAR(255) NOT NULL,
-    start_date DATE NOT NULL,
-    end_date DATE,
-    project_manager INT NOT NULL REFERENCES employees(id),
-    comment TEXT,
-    status VARCHAR(50) NOT NULL
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  description TEXT
+);
+
+insert into employee_projects(employee_id, project_id) values(1, 1);
+
+CREATE TABLE employee_projects (
+    employee_id INT REFERENCES employees(id),
+    project_id INT REFERENCES projects(id),
+    PRIMARY KEY (employee_id, project_id)
 );
 
 

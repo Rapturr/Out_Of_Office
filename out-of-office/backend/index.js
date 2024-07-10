@@ -26,12 +26,7 @@ app.get("/api/employees", async (req, res) => {
 
 // Add a new employee
 app.post("/api/employees", async (req, res) => {
-  const {
-    full_name,
-    subdivision,
-    position,
-    status = "Active",
-  } = req.body;
+  const { full_name, subdivision, position, status = "Active" } = req.body;
   try {
     const result = await pool.query(
       "INSERT INTO employees (full_name, subdivision, position, status) VALUES ($1, $2, $3, $4) RETURNING *",
@@ -67,6 +62,62 @@ app.put("/api/employees/:id/deactivate", async (req, res) => {
       ["Inactive", id]
     );
     res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get an employee's details
+app.get("/api/employees/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query("SELECT * FROM employees WHERE id = $1", [
+      id,
+    ]);
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get projects assigned to an employee
+app.get("/api/employees/:id/projects", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT p.* FROM projects p
+       INNER JOIN employee_projects ep ON p.id = ep.project_id
+       WHERE ep.employee_id = $1`,
+      [id]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Assign a project to an employee
+app.post("/api/employees/:id/projects", async (req, res) => {
+  const { id } = req.params;
+  const { projectId } = req.body;
+  try {
+    await pool.query(
+      "INSERT INTO employee_projects (employee_id, project_id) VALUES ($1, $2)",
+      [id, projectId]
+    );
+    res
+      .status(201)
+      .json({ message: "Project assigned to employee successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get all projects
+app.get("/api/projects", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM projects");
+    res.json(result.rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
