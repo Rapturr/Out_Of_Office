@@ -1,19 +1,27 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import EmployeeDetails from "./EmployeeDetails";
+import { useNavigate } from "react-router-dom";
 
-const EmployeeList = () => {
+const EmployeeList = ({ Loggeduser }) => {
   const [employees, setEmployees] = useState([]);
   const [inputText, setInputText] = useState("");
   const [form, setForm] = useState({
     full_name: "",
     subdivision: "",
     position: "",
-    status: "Active",
+    people_partner: null,
+    out_of_office_balance: 0,
+    photo: null,
   });
   const [editingId, setEditingId] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const navigate = useNavigate();
+
+  const logout = () => {
+    navigate("/");
+  };
 
   const fetchEmployees = async () => {
     const result = await axios.get("http://localhost:5000/api/employees");
@@ -36,7 +44,10 @@ const EmployeeList = () => {
   const handleAddOrUpdateEmployee = async () => {
     try {
       if (editingId) {
-        await axios.put(`http://localhost:5000/api/employees/${editingId}`, form);
+        await axios.put(
+          `http://localhost:5000/api/employees/${editingId}`,
+          form
+        );
       } else {
         await axios.post("http://localhost:5000/api/employees", form);
       }
@@ -45,7 +56,8 @@ const EmployeeList = () => {
         full_name: "",
         subdivision: "",
         position: "",
-        status: "Active",
+        people_partner: "",
+        out_of_office_balance: "",
       });
       setEditingId(null);
     } catch (error) {
@@ -81,58 +93,104 @@ const EmployeeList = () => {
     return 0;
   });
 
-  return (
-    <div>
-      <h1>Employees</h1>
-      <div className="search">
-        <input type="text" onChange={inputHandler} placeholder="Search" />
-      </div>
+  if (Loggeduser == 1)
+    return (
       <div>
-        <h2>{editingId ? "Edit Employee" : "Add Employee"}</h2>
-        <form>
-          <input
-            name="full_name"
-            value={form.full_name}
-            onChange={handleFormChange}
-            placeholder="Full Name"
-          />
-          <input
-            name="subdivision"
-            value={form.subdivision}
-            onChange={handleFormChange}
-            placeholder="Subdivision"
-          />
-          <input
-            name="position"
-            value={form.position}
-            onChange={handleFormChange}
-            placeholder="Position"
-          />
-          <button type="button" onClick={handleAddOrUpdateEmployee}>
-            {editingId ? "Update" : "Add"}
-          </button>
-        </form>
-      </div>
-      {selectedEmployee && (
-        <EmployeeDetails
-          employeeId={selectedEmployee.id}
-          onClose={() => setSelectedEmployee(null)}
-        />
-      )}
-      <List
-        employees={sortedEmployees}
-        input={inputText}
-        onEdit={handleEditEmployee}
-        onDeactivate={handleDeactivateEmployee}
-        onSelect={setSelectedEmployee}
-        handleSort={handleSort}
-        sortConfig={sortConfig}
-      />
-    </div>
-  );
-};
+        <button
+          onClick={() => {
+            logout();
+          }}
+        >
+          Logout
+        </button>
+        <h1>Employees</h1>
+        <div className="search">
+          <input type="text" onChange={inputHandler} placeholder="Search" />
+        </div>
+        <div>
+          <h2>{editingId ? "Edit Employee" : "Add Employee"}</h2>
+          <form>
+            <input
+              name="full_name"
+              onChange={handleFormChange}
+              placeholder="Full Name"
+            />
+            <input
+              name="subdivision"
+              onChange={handleFormChange}
+              placeholder="Subdivision"
+            />
+            <input
+              name="position"
+              onChange={handleFormChange}
+              placeholder="Position"
+            />
+            <input
+              type="number"
+              name="people_partner"
+              onChange={handleFormChange}
+              placeholder="People Partner"
+            />
+            <input
+              type="number"
+              name="out_of_office_balance"
+              onChange={handleFormChange}
+              placeholder="Out of Office Balance"
+              required
+            />
+            <input
+              type="file"
+              name="photo"
+              onChange={(e) => setForm({ ...form, photo: e.target.files[0] })}
+            />
+            <button type="button" onClick={handleAddOrUpdateEmployee}>
+              {editingId ? "Update" : "Add"}
+            </button>
+          </form>
+        </div>
 
-function List({ employees, input, onEdit, onDeactivate, onSelect, handleSort, sortConfig }) {
+        <List_HR
+          employees={sortedEmployees}
+          input={inputText}
+          onEdit={handleEditEmployee}
+          onDeactivate={handleDeactivateEmployee}
+          handleSort={handleSort}
+          sortConfig={sortConfig}
+        />
+      </div>
+    );
+  else if (Loggeduser == 2)
+    return (
+      <div>
+        <h1>Employees</h1>
+        <div className="search">
+          <input type="text" onChange={inputHandler} placeholder="Search" />
+        </div>
+
+        {selectedEmployee && (
+          <EmployeeDetails
+            employeeId={selectedEmployee.id}
+            onClose={() => setSelectedEmployee(null)}
+          />
+        )}
+        <List_PM
+          employees={sortedEmployees}
+          input={inputText}
+          onSelect={setSelectedEmployee}
+          handleSort={handleSort}
+          sortConfig={sortConfig}
+        />
+      </div>
+    );
+};
+function List_HR({
+  employees,
+  input,
+  onEdit,
+  onDeactivate,
+  handleSort,
+  sortConfig,
+}) {
   const filterData = employees.filter((employee) => {
     if (input === "") {
       return true;
@@ -147,13 +205,28 @@ function List({ employees, input, onEdit, onDeactivate, onSelect, handleSort, so
         <thead>
           <tr>
             <th onClick={() => handleSort("full_name")}>
-              Full Name {sortConfig.key === "full_name" ? (sortConfig.direction === "asc" ? "↑" : "↓") : null}
+              Full Name{" "}
+              {sortConfig.key === "full_name"
+                ? sortConfig.direction === "asc"
+                  ? "↑"
+                  : "↓"
+                : null}
             </th>
             <th onClick={() => handleSort("subdivision")}>
-              Subdivision {sortConfig.key === "subdivision" ? (sortConfig.direction === "asc" ? "↑" : "↓") : null}
+              Subdivision{" "}
+              {sortConfig.key === "subdivision"
+                ? sortConfig.direction === "asc"
+                  ? "↑"
+                  : "↓"
+                : null}
             </th>
             <th onClick={() => handleSort("position")}>
-              Position {sortConfig.key === "position" ? (sortConfig.direction === "asc" ? "↑" : "↓") : null}
+              Position{" "}
+              {sortConfig.key === "position"
+                ? sortConfig.direction === "asc"
+                  ? "↑"
+                  : "↓"
+                : null}
             </th>
             <th>Status</th>
             <th>Actions</th>
@@ -168,7 +241,68 @@ function List({ employees, input, onEdit, onDeactivate, onSelect, handleSort, so
               <td>{employee.status}</td>
               <td>
                 <button onClick={() => onEdit(employee)}>Edit</button>
-                <button onClick={() => onDeactivate(employee.id)}>Deactivate</button>
+                <button onClick={() => onDeactivate(employee.id)}>
+                  Deactivate
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function List_PM({ employees, input, onSelect, handleSort, sortConfig }) {
+  const filterData = employees.filter((employee) => {
+    if (input === "") {
+      return true;
+    } else {
+      return employee.full_name.toLowerCase().includes(input);
+    }
+  });
+
+  return (
+    <div>
+      <table>
+        <thead>
+          <tr>
+            <th onClick={() => handleSort("full_name")}>
+              Full Name{" "}
+              {sortConfig.key === "full_name"
+                ? sortConfig.direction === "asc"
+                  ? "↑"
+                  : "↓"
+                : null}
+            </th>
+            <th onClick={() => handleSort("subdivision")}>
+              Subdivision{" "}
+              {sortConfig.key === "subdivision"
+                ? sortConfig.direction === "asc"
+                  ? "↑"
+                  : "↓"
+                : null}
+            </th>
+            <th onClick={() => handleSort("position")}>
+              Position{" "}
+              {sortConfig.key === "position"
+                ? sortConfig.direction === "asc"
+                  ? "↑"
+                  : "↓"
+                : null}
+            </th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filterData.map((employee) => (
+            <tr key={employee.id}>
+              <td>{employee.full_name}</td>
+              <td>{employee.subdivision}</td>
+              <td>{employee.position}</td>
+              <td>{employee.status}</td>
+              <td>
                 <button onClick={() => onSelect(employee)}>View Details</button>
               </td>
             </tr>

@@ -3,10 +3,24 @@ CREATE TABLE employees (
     full_name VARCHAR(255) NOT NULL,
     subdivision VARCHAR(255) NOT NULL,
     position VARCHAR(255) NOT NULL,
-    status VARCHAR(50) NOT NULL
+    status VARCHAR(50) NOT NULL,
+    people_partner INT,
+    out_of_office_balance INT NOT NULL,
+    photo BYTEA,
+    CONSTRAINT fk_people_partner FOREIGN KEY (people_partner) REFERENCES employees(id)
 );
 
-insert into employees(id, full_name, subdivision, position, status) values(1,'John Doe', 'HQ', 'Director', 'Employed');
+-- Create a partial unique index to ensure that only one employee can be an HR Manager
+CREATE UNIQUE INDEX unique_hr_manager ON employees (id) WHERE position = 'HR Manager';
+
+INSERT INTO employees (full_name, subdivision, position, status, out_of_office_balance)
+VALUES ('John Doe', 'HR', 'HR Manager', 'Active', 10);
+
+INSERT INTO employees (full_name, subdivision, position, status, out_of_office_balance, people_partner)
+VALUES ('Jane Smith', 'IT', 'Project Manager', 'Active', 15, 1);
+
+INSERT INTO employees (full_name, subdivision, position, status, out_of_office_balance, people_partner)
+VALUES ('Alice Johnson', 'IT', 'Employee', 'Active', 20, 1);
 
 CREATE TABLE leave_requests (
     id SERIAL PRIMARY KEY,
@@ -25,15 +39,16 @@ CREATE TABLE approval_requests (
     status VARCHAR(50) NOT NULL DEFAULT 'New',
     comment TEXT
 );
-insert into projects(id, name, description) values(1,'Out of office app', 'An out of office app solution');
 
 CREATE TABLE projects (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
-  description TEXT
+    id SERIAL PRIMARY KEY,
+    project_type VARCHAR(255) NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE,
+    project_manager INT NOT NULL REFERENCES employees(id),
+    comment TEXT,
+    status VARCHAR(50) NOT NULL
 );
-
-insert into employee_projects(employee_id, project_id) values(1, 1);
 
 CREATE TABLE employee_projects (
     employee_id INT REFERENCES employees(id),
@@ -42,6 +57,7 @@ CREATE TABLE employee_projects (
 );
 
 
+drop table employee_projects, projects, approval_requests, leave_requests, employees;
 
 npm start
 npm run serve

@@ -1,31 +1,25 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import TwitterLogo from "../../assets/images/twitter.svg";
 
 function Login({ setUser }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [ID, setID] = useState("");
   const navigate = useNavigate();
-
-  const goToHomepage = () => {
-    navigate("/Homepage");
-  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    //"proxy": "http://localhost:5000", --> package.json
+    //http://localhost:5000/
     try {
-      const response = await axios.post("/login", {
-        email,
-        password,
-      });
+      const response = await axios.get(
+        `http://localhost:5000/api/employees/${ID}`
+      );
       console.log(response.data);
       if (response.data.message === "Login successful") {
-        setUser(response.data.user);
-        navigate("/dashboard");
+        setUser(response.data.id);
+        setUser(ID);
+        navigate("/employees");
       } else {
-        alert("Invalid email or password");
+        alert("Invalid ID");
       }
     } catch (error) {
       console.error("There was an error logging in!", error);
@@ -35,35 +29,18 @@ function Login({ setUser }) {
 
   return (
     <div>
-      <h1 class="title" style={{ marginTop: "100px" }}>
-        Sign in to Twitter
-      </h1>
+      <h1>Use your ID to Log In</h1>
       <form onSubmit={handleSubmit}>
         <div>
           <input
             class="input"
-            placeholder="Email"
-            type="text"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            placeholder="ID"
+            type="number"
+            value={ID}
+            onChange={(e) => setID(e.target.value)}
           />
         </div>
-        <div>
-          <input
-            class="input"
-            placeholder="Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <button
-          class="primary_button"
-          style={{ marginTop: "50px" }}
-          type="submit"
-        >
-          Login
-        </button>
+        <button type="submit">Login</button>
       </form>
     </div>
   );
