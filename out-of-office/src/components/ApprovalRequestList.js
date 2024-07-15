@@ -1,17 +1,13 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import Navigator from "./Navigator";
 
 const ApprovalRequestList = ({ Loggeduser }) => {
   const [requests, setRequests] = useState([]);
   const [inputText, setInputText] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [selectedRequest, setSelectedRequest] = useState(null);
-  const navigate = useNavigate();
-
-  const logout = () => {
-    navigate("/");
-  };
+ 
 
   const fetchRequests = async () => {
     const result = await axios.get(
@@ -74,13 +70,8 @@ const ApprovalRequestList = ({ Loggeduser }) => {
 
   return (
     <div>
-      <button
-        onClick={() => {
-          logout();
-        }}
-      >
-        Logout
-      </button>
+      <Navigator />
+      
       <h1>Approval Requests</h1>
       <div className="search">
         <input

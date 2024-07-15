@@ -9,22 +9,35 @@ const EmployeeDetails = ({ employeeId, onClose }) => {
 
   useEffect(() => {
     const fetchEmployeeDetails = async () => {
-      const result = await axios.get(
-        `http://localhost:5000/api/employees/${employeeId}`
-      );
-      setEmployee(result.data);
+      try {
+        const result = await axios.get(
+          `http://localhost:5000/api/employees/${employeeId}`
+        );
+        setEmployee(result.data.user);
+      } catch (error) {
+        console.error("Error fetching employee details:", error);
+      }
     };
 
     const fetchProjects = async () => {
-      const result = await axios.get("http://localhost:5000/api/projects");
-      setProjects(result.data);
+      try {
+        const result = await axios.get("http://localhost:5000/api/projects");
+        setProjects(result.data);
+        console.log(result.data);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
     };
 
     const fetchEmployeeProjects = async () => {
-      const result = await axios.get(
-        `http://localhost:5000/api/employees/${employeeId}/projects`
-      );
-      setEmployeeProjects(result.data);
+      try {
+        const result = await axios.get(
+          `http://localhost:5000/api/employees/${employeeId}/projects`
+        );
+        setEmployeeProjects(result.data);
+      } catch (error) {
+        console.error("Error fetching employee projects:", error);
+      }
     };
 
     fetchEmployeeDetails();
@@ -33,16 +46,20 @@ const EmployeeDetails = ({ employeeId, onClose }) => {
   }, [employeeId]);
 
   const handleAssignProject = async () => {
-    await axios.post(
-      `http://localhost:5000/api/employees/${employeeId}/projects`,
-      {
-        projectId: selectedProject,
-      }
-    );
-    const updatedEmployeeProjects = await axios.get(
-      `http://localhost:5000/api/employees/${employeeId}/projects`
-    );
-    setEmployeeProjects(updatedEmployeeProjects.data);
+    try {
+      await axios.post(
+        `http://localhost:5000/api/employees/${employeeId}/projects`,
+        {
+          projectId: selectedProject,
+        }
+      );
+      const updatedEmployeeProjects = await axios.get(
+        `http://localhost:5000/api/employees/${employeeId}/projects`
+      );
+      setEmployeeProjects(updatedEmployeeProjects.data);
+    } catch (error) {
+      console.error("Error assigning project:", error);
+    }
   };
 
   if (!employee) return <div>Loading...</div>;
@@ -57,7 +74,7 @@ const EmployeeDetails = ({ employeeId, onClose }) => {
       <h3>Projects</h3>
       <ul>
         {employeeProjects.map((project) => (
-          <li key={project.id}>{project.name}</li>
+          <li key={project.id}>{project.project_type}</li>
         ))}
       </ul>
       <select
@@ -69,7 +86,7 @@ const EmployeeDetails = ({ employeeId, onClose }) => {
         </option>
         {projects.map((project) => (
           <option key={project.id} value={project.id}>
-            {project.name}
+            {project.project_type}
           </option>
         ))}
       </select>

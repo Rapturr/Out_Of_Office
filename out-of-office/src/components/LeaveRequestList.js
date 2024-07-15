@@ -1,26 +1,34 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import Navigator from "./Navigator";
 
 const LeaveRequestList = ({ Loggeduser }) => {
   const [requests, setRequests] = useState([]);
   const [inputText, setInputText] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+  const [form, setForm] = useState({
+    absence_reason: "",
+    start_date: "",
+    end_date: "",
+    comment: "",
+    status: "new",
+  });
   const [selectedRequest, setSelectedRequest] = useState(null);
-  const navigate = useNavigate();
-
-  const logout = () => {
-    navigate("/");
-  };
-
-  const fetchRequests = async () => {
-    const result = await axios.get("http://localhost:5000/api/leave-requests");
-    setRequests(result.data);
-  };
 
   useEffect(() => {
     fetchRequests();
   }, []);
+
+  const fetchRequests = async () => {
+    try {
+      const result = await axios.get(
+        `http://localhost:5000/api/personal-leave-requests/${Loggeduser}`
+      );
+      setRequests(result.data);
+    } catch (error) {
+      console.error("Error fetching leave requests:", error);
+    }
+  };
 
   const inputHandler = (e) => {
     setInputText(e.target.value.toLowerCase());
@@ -44,40 +52,127 @@ const LeaveRequestList = ({ Loggeduser }) => {
     return 0;
   });
 
+  const handleAddOrUpdateRequest = async () => {
+    try {
+      if (selectedRequest) {
+        await axios.put(
+          `http://localhost:5000/api/leave-requests/${selectedRequest.id}`,
+          { ...form, employee: Loggeduser }
+        );
+      } else {
+        await axios.post("http://localhost:5000/api/leave-requests", {
+          ...form,
+          employee: Loggeduser,
+        });
+      }
+      fetchRequests();
+      setForm({
+        absence_reason: "",
+        start_date: "",
+        end_date: "",
+        comment: "",
+        status: "new",
+      });
+      setSelectedRequest(null);
+    } catch (error) {
+      console.error("Error adding/updating leave request:", error);
+    }
+  };
+
   const filteredRequests = sortedRequests.filter((request) =>
-    request.request_number.toLowerCase().includes(inputText)
+    request.absence_reason.toLowerCase().includes(inputText)
   );
 
   const handleViewDetails = async (id) => {
-    const result = await axios.get(
-      `http://localhost:5000/api/leave-requests/${id}`
-    );
-    setSelectedRequest(result.data);
+    try {
+      const result = await axios.get(
+        `http://localhost:5000/api/leave-requests/${id}`
+      );
+      setSelectedRequest(result.data);
+    } catch (error) {
+      console.error("Error fetching request details:", error);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prevForm) => ({
+      ...prevForm,
+      [name]: value,
+    }));
   };
 
   return (
     <div>
-      <button
-        onClick={() => {
-          logout();
-        }}
-      >
-        Logout
-      </button>
+      <Navigator />
+
       <h1>Leave Requests</h1>
       <div className="search">
         <input
           type="text"
           onChange={inputHandler}
-          placeholder="Search by request number"
+          placeholder="Search by reason"
         />
       </div>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleAddOrUpdateRequest();
+        }}
+      >
+        <input
+          type="text"
+          name="absence_reason"
+          value={form.absence_reason}
+          onChange={handleChange}
+          placeholder="Absence Reason"
+          required
+        />
+        <input
+          type="date"
+          name="start_date"
+          value={form.start_date}
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="date"
+          name="end_date"
+          value={form.end_date}
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="text"
+          name="comment"
+          value={form.comment}
+          onChange={handleChange}
+          placeholder="Comment"
+        />
+        <button type="submit">Submit</button>
+      </form>
       <table>
         <thead>
           <tr>
-            <th onClick={() => handleSort("request_number")}>
-              Request Number{" "}
-              {sortConfig.key === "request_number"
+            <th onClick={() => handleSort("absence_reason")}>
+              Absence Reason{" "}
+              {sortConfig.key === "absence_reason"
+                ? sortConfig.direction === "asc"
+                  ? "↑"
+                  : "↓"
+                : null}
+            </th>
+            <th onClick={() => handleSort("start_date")}>
+              Start Date{" "}
+              {sortConfig.key === "start_date"
+                ? sortConfig.direction === "asc"
+                  ? "↑"
+                  : "↓"
+                : null}
+            </th>
+            <th onClick={() => handleSort("end_date")}>
+              End Date{" "}
+              {sortConfig.key === "end_date"
                 ? sortConfig.direction === "asc"
                   ? "↑"
                   : "↓"
@@ -91,18 +186,16 @@ const LeaveRequestList = ({ Loggeduser }) => {
                   : "↓"
                 : null}
             </th>
-            <th>Start Date</th>
-            <th>End Date</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {filteredRequests.map((request) => (
             <tr key={request.id}>
-              <td>{request.request_number}</td>
-              <td>{request.status}</td>
+              <td>{request.absence_reason}</td>
               <td>{request.start_date}</td>
               <td>{request.end_date}</td>
+              <td>{request.status}</td>
               <td>
                 <button onClick={() => handleViewDetails(request.id)}>
                   View Details
@@ -126,11 +219,11 @@ const RequestDetails = ({ request, onClose }) => {
   return (
     <div>
       <h2>Request Details</h2>
-      <p>Request Number: {request.request_number}</p>
+      <p>Absence Reason: {request.absence_reason}</p>
       <p>Status: {request.status}</p>
       <p>Start Date: {request.start_date}</p>
       <p>End Date: {request.end_date}</p>
-      <p>Reason: {request.reason}</p>
+      <p>Comment: {request.comment}</p>
       <button onClick={onClose}>Close</button>
     </div>
   );

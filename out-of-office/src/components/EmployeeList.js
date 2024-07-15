@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import EmployeeDetails from "./EmployeeDetails";
-import { useNavigate } from "react-router-dom";
+import Navigator from "./Navigator";
 
 const EmployeeList = ({ Loggeduser }) => {
   const [employees, setEmployees] = useState([]);
@@ -17,11 +17,6 @@ const EmployeeList = ({ Loggeduser }) => {
   const [editingId, setEditingId] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [selectedEmployee, setSelectedEmployee] = useState(null);
-  const navigate = useNavigate();
-
-  const logout = () => {
-    navigate("/");
-  };
 
   const fetchEmployees = async () => {
     const result = await axios.get("http://localhost:5000/api/employees");
@@ -67,6 +62,7 @@ const EmployeeList = ({ Loggeduser }) => {
 
   const handleEditEmployee = (employee) => {
     setForm(employee);
+    console.log(form);
     setEditingId(employee.id);
   };
 
@@ -96,13 +92,7 @@ const EmployeeList = ({ Loggeduser }) => {
   if (Loggeduser == 1)
     return (
       <div>
-        <button
-          onClick={() => {
-            logout();
-          }}
-        >
-          Logout
-        </button>
+        <Navigator />
         <h1>Employees</h1>
         <div className="search">
           <input type="text" onChange={inputHandler} placeholder="Search" />
@@ -114,28 +104,33 @@ const EmployeeList = ({ Loggeduser }) => {
               name="full_name"
               onChange={handleFormChange}
               placeholder="Full Name"
+              value={form.full_name}
             />
             <input
               name="subdivision"
               onChange={handleFormChange}
               placeholder="Subdivision"
+              value={form.subdivision}
             />
             <input
               name="position"
               onChange={handleFormChange}
               placeholder="Position"
+              value={form.position}
             />
             <input
               type="number"
               name="people_partner"
               onChange={handleFormChange}
               placeholder="People Partner"
+              value={form.people_partner}
             />
             <input
               type="number"
               name="out_of_office_balance"
               onChange={handleFormChange}
               placeholder="Out of Office Balance"
+              value={form.out_of_office_balance}
               required
             />
             <input
@@ -162,6 +157,7 @@ const EmployeeList = ({ Loggeduser }) => {
   else if (Loggeduser == 2)
     return (
       <div>
+        <Navigator />
         <h1>Employees</h1>
         <div className="search">
           <input type="text" onChange={inputHandler} placeholder="Search" />
@@ -182,6 +178,24 @@ const EmployeeList = ({ Loggeduser }) => {
         />
       </div>
     );
+  else {
+    return (
+      <div>
+        <Navigator />
+        <h1>Employees</h1>
+        <div className="search">
+          <input type="text" onChange={inputHandler} placeholder="Search" />
+        </div>
+
+        {
+          <EmployeeDetails
+            employeeId={Loggeduser}
+            onClose={() => setSelectedEmployee(null)}
+          />
+        }
+      </div>
+    );
+  }
 };
 function List_HR({
   employees,

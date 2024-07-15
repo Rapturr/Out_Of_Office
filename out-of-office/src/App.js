@@ -6,6 +6,7 @@ import ApprovalRequestList from "./components/ApprovalRequestList";
 import LeaveRequestList from "./components/LeaveRequestList";
 import ProjectList from "./components/ProjectList";
 import Login from "./components/Login";
+import { useNavigate } from "react-router-dom";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -14,8 +15,14 @@ function App() {
     <Router>
       <div className="App">
         <Routes>
-          <Route path="/employees" element={<EmployeeList Loggeduser={user} />} />
-          <Route path="/requests" element={<LeaveRequestList Loggeduser={user} />} />
+          <Route
+            path="/employees"
+            element={<EmployeeList Loggeduser={user} />}
+          />
+          <Route
+            path="/requests"
+            element={<LeaveRequestList Loggeduser={user} />}
+          />
           <Route
             path="/approvalrequests"
             element={<ApprovalRequestList Loggeduser={user} />}

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Navigator from "./Navigator";
 
 const ProjectList = ({ Loggeduser }) => {
   const [projects, setProjects] = useState([]);
@@ -18,9 +19,6 @@ const ProjectList = ({ Loggeduser }) => {
   const [editingId, setEditingId] = useState(null);
   const navigate = useNavigate();
 
-  const logout = () => {
-    navigate("/");
-  };
 
   const fetchProjects = async () => {
     const result = await axios.get("http://localhost:5000/api/projects");
@@ -97,13 +95,8 @@ const ProjectList = ({ Loggeduser }) => {
 
   return (
     <div>
-      <button
-        onClick={() => {
-          logout();
-        }}
-      >
-        Logout
-      </button>
+      <Navigator />
+      
       <h1>Projects</h1>
       <div className="search">
         <input

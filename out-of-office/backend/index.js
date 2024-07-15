@@ -176,15 +176,6 @@ app.get("/api/projects/:id", async (req, res) => {
 
 // Add a new project
 app.post("/api/projects", async (req, res) => {
-  /*
-  project_type: "",
-    name: "",
-    start_date: "",
-    end_date: "",
-    project_manager: 2,
-    comment: "",
-    status: "",
-     */
   const {
     project_type,
     start_date,
@@ -309,6 +300,7 @@ app.put("/api/approval-requests/:id/reject", async (req, res) => {
   }
 });
 
+// Fetch leave requests
 app.get("/api/leave-requests", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM leave_requests");
@@ -334,3 +326,60 @@ app.get("/api/leave-requests/:id", async (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// Add a new leave request
+app.post("/api/leave-requests", async (req, res) => {
+  const { employee, absence_reason, start_date, end_date, comment } = req.body;
+  try {
+    const result = await pool.query(
+      "INSERT INTO leave_requests (employee, absence_reason, start_date, end_date, comment, status) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+      [employee, absence_reason, start_date, end_date, comment, "new"]
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/*
+// Fetch personal leave requests
+app.get("/api/personal-leave-requests/:id", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM leave_requests WHERE employee = 3"
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+*/
+// Get an employee's details
+app.get("/api/personal-leave-requests/:id", async (req, res) => {
+  const { id } = req.params;
+  console.log("ID = ", id);
+  try {
+    const result = await pool.query(
+      "SELECT * FROM leave_requests where employee = $1",
+      [id]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: err.message });
+  }
+});
+/*
+app.get("/api/personal-leave-requests/:id", async (req, res) => {
+  const { id } = req.params;
+  console.log("User ", id);
+  try {
+    const result = await pool.query(
+      "SELECT * FROM leave_requests where employee = $1",
+      [id]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+*/
