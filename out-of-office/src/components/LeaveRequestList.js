@@ -134,7 +134,7 @@ const LeaveRequestList = ({ Loggeduser }) => {
           placeholder="Search by reason"
         />
       </div>
-      <form
+      <form className="edit"
         onSubmit={(e) => {
           e.preventDefault();
           handleAddOrUpdateRequest();

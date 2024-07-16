@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import EmployeeDetails from "./EmployeeDetails";
 import Navigator from "./Navigator";
+import "../App.css";
 
 const EmployeeList = ({ Loggeduser }) => {
   const [employees, setEmployees] = useState([]);
@@ -94,54 +95,56 @@ const EmployeeList = ({ Loggeduser }) => {
       <div>
         <Navigator />
         <h1>Employees</h1>
-        <div className="search">
-          <input type="text" onChange={inputHandler} placeholder="Search" />
-        </div>
-        <div>
-          <h2>{editingId ? "Edit Employee" : "Add Employee"}</h2>
-          <form>
-            <input
-              name="full_name"
-              onChange={handleFormChange}
-              placeholder="Full Name"
-              value={form.full_name}
-            />
-            <input
-              name="subdivision"
-              onChange={handleFormChange}
-              placeholder="Subdivision"
-              value={form.subdivision}
-            />
-            <input
-              name="position"
-              onChange={handleFormChange}
-              placeholder="Position"
-              value={form.position}
-            />
-            <input
-              type="number"
-              name="people_partner"
-              onChange={handleFormChange}
-              placeholder="People Partner"
-              value={form.people_partner}
-            />
-            <input
-              type="number"
-              name="out_of_office_balance"
-              onChange={handleFormChange}
-              placeholder="Out of Office Balance"
-              value={form.out_of_office_balance}
-              required
-            />
-            <input
-              type="file"
-              name="photo"
-              onChange={(e) => setForm({ ...form, photo: e.target.files[0] })}
-            />
-            <button type="button" onClick={handleAddOrUpdateEmployee}>
-              {editingId ? "Update" : "Add"}
-            </button>
-          </form>
+        <div className="block">
+          <div className="search">
+            <input type="text" onChange={inputHandler} placeholder="Search" />
+          </div>
+          <div>
+            <form className="edit">
+              <h2>{editingId ? "Edit Employee" : "Add Employee"}</h2>
+              <input
+                name="full_name"
+                onChange={handleFormChange}
+                placeholder="Full Name"
+                value={form.full_name}
+              />
+              <input
+                name="subdivision"
+                onChange={handleFormChange}
+                placeholder="Subdivision"
+                value={form.subdivision}
+              />
+              <input
+                name="position"
+                onChange={handleFormChange}
+                placeholder="Position"
+                value={form.position}
+              />
+              <input
+                type="number"
+                name="people_partner"
+                onChange={handleFormChange}
+                placeholder="People Partner"
+                value={form.people_partner}
+              />
+              <input
+                type="number"
+                name="out_of_office_balance"
+                onChange={handleFormChange}
+                placeholder="Out of Office Balance"
+                value={form.out_of_office_balance}
+                required
+              />
+              <input
+                type="file"
+                name="photo"
+                onChange={(e) => setForm({ ...form, photo: e.target.files[0] })}
+              />
+              <button type="button" onClick={handleAddOrUpdateEmployee}>
+                {editingId ? "Update" : "Add"}
+              </button>
+            </form>
+          </div>
         </div>
 
         <List_HR
@@ -214,7 +217,7 @@ function List_HR({
   });
 
   return (
-    <div>
+    <div className="employeeList">
       <table>
         <thead>
           <tr>
@@ -277,7 +280,7 @@ function List_PM({ employees, input, onSelect, handleSort, sortConfig }) {
   });
 
   return (
-    <div>
+    <div className="employeeList">
       <table>
         <thead>
           <tr>

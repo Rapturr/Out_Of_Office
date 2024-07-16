@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import "../App.css";
 
 function Login({ setUser }) {
   const [ID, setID] = useState("");
@@ -28,17 +29,19 @@ function Login({ setUser }) {
   };
 
   return (
-    <div>
+    <div className="Login">
       <h1>Use your ID to Log In</h1>
       <form onSubmit={handleSubmit}>
-        <div>
+        <div className="inputbox">
           <input
+            required="required"
             class="input"
+            type="text"
             placeholder="ID"
-            type="number"
             value={ID}
             onChange={(e) => setID(e.target.value)}
           />
+          <i></i>
         </div>
         <button type="submit">Login</button>
       </form>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "../App.css";
 
 function Navigator() {
   const navigate = useNavigate();
@@ -8,9 +9,9 @@ function Navigator() {
     navigate(dest);
   };
   return (
-    <div>
-      <nav>
-        <ul>
+    <div className="navbar">
+      <nav className="nav">
+        <ul className="navlinks">
           <li>
             <a onClick={() => navto("/")}>Home</a>
           </li>

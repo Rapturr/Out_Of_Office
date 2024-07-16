@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Navigator from "./Navigator";
+import "../App.css";
 
 const ApprovalRequests = ({ Loggeduser }) => {
   const [requests, setRequests] = useState([]);
@@ -82,78 +83,70 @@ const ApprovalRequests = ({ Loggeduser }) => {
       console.error("Error rejecting request:", error);
     }
   };
-  if (Loggeduser == 1 || Loggeduser == 2)
-    return (
-      <div>
-        <Navigator />
-        <h1>Approval Requests</h1>
-        <div className="search">
-          <input
-            type="text"
-            onChange={(e) => setInputText(e.target.value.toLowerCase())}
-            placeholder="Search by request number"
-          />
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th onClick={() => handleSort("id")}>
-                Request Number{" "}
-                {sortConfig.key === "id"
-                  ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
-                  : null}
-              </th>
-              <th onClick={() => handleSort("status")}>
-                Status{" "}
-                {sortConfig.key === "status"
-                  ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
-                  : null}
-              </th>
-              <th>Actions</th>
+  return (
+    <div>
+      <Navigator />
+      <h1>Approval Requests</h1>
+      <div className="search">
+        <input
+          type="text"
+          onChange={(e) => setInputText(e.target.value.toLowerCase())}
+          placeholder="Search by request number"
+        />
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th onClick={() => handleSort("id")}>
+              Request Number{" "}
+              {sortConfig.key === "id"
+                ? sortConfig.direction === "asc"
+                  ? "↑"
+                  : "↓"
+                : null}
+            </th>
+            <th onClick={() => handleSort("status")}>
+              Status{" "}
+              {sortConfig.key === "status"
+                ? sortConfig.direction === "asc"
+                  ? "↑"
+                  : "↓"
+                : null}
+            </th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredRequests.map((request) => (
+            <tr key={request.id}>
+              <td>{request.id}</td>
+              <td>{request.status}</td>
+              <td>
+                <button onClick={() => handleViewDetails(request)}>
+                  View Details
+                </button>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {filteredRequests.map((request) => (
-              <tr key={request.id}>
-                <td>{request.id}</td>
-                <td>{request.status}</td>
-                <td>
-                  <button onClick={() => handleViewDetails(request)}>
-                    View Details
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {selectedRequest && (
-          <div>
-            <h2>Request Details</h2>
-            <p>Request Number: {selectedRequest.id}</p>
-            <p>Status: {selectedRequest.status}</p>
-            <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Comment"
-            />
-            <button onClick={handleApprove}>Approve</button>
-            <button onClick={handleReject}>Reject</button>
-            <button onClick={() => setSelectedRequest(null)}>Close</button>
-          </div>
-        )}
-      </div>
-    );
-  else {
-    return (
-      <div>
-        <Navigator />
-      </div>
-    );
-  }
+          ))}
+        </tbody>
+      </table>
+      {selectedRequest && (
+        <div>
+          <h2>Request Details</h2>
+          <p>Request Number: {selectedRequest.id}</p>
+          <p>Status: {selectedRequest.status}</p>
+          <textarea
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            placeholder="Comment"
+          />
+          <button onClick={handleApprove}>Approve</button>
+          <button onClick={handleReject}>Reject</button>
+          <button onClick={() => setSelectedRequest(null)}>Close</button>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default ApprovalRequests;

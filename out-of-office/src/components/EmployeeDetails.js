@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import "../App.css";
 
 const EmployeeDetails = ({ employeeId, onClose }) => {
   const [employee, setEmployee] = useState(null);

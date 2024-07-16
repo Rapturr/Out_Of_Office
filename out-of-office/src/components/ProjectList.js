@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Navigator from "./Navigator";
+import "../App.css";
 
 const ProjectList = ({ Loggeduser }) => {
   const [projects, setProjects] = useState([]);
