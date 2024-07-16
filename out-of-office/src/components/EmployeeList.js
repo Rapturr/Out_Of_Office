@@ -140,7 +140,7 @@ const EmployeeList = ({ Loggeduser }) => {
                 name="photo"
                 onChange={(e) => setForm({ ...form, photo: e.target.files[0] })}
               />
-              <button type="button" onClick={handleAddOrUpdateEmployee}>
+              <button className="btn" type="button" onClick={handleAddOrUpdateEmployee}>
                 {editingId ? "Update" : "Add"}
               </button>
             </form>
@@ -257,8 +257,8 @@ function List_HR({
               <td>{employee.position}</td>
               <td>{employee.status}</td>
               <td>
-                <button onClick={() => onEdit(employee)}>Edit</button>
-                <button onClick={() => onDeactivate(employee.id)}>
+                <button className="btn" onClick={() => onEdit(employee)}>Edit</button>
+                <button className="btn" onClick={() => onDeactivate(employee.id)}>
                   Deactivate
                 </button>
               </td>
@@ -320,7 +320,7 @@ function List_PM({ employees, input, onSelect, handleSort, sortConfig }) {
               <td>{employee.position}</td>
               <td>{employee.status}</td>
               <td>
-                <button onClick={() => onSelect(employee)}>View Details</button>
+                <button className="btn" onClick={() => onSelect(employee)}>View Details</button>
               </td>
             </tr>
           ))}

@@ -94,55 +94,68 @@ const ApprovalRequests = ({ Loggeduser }) => {
           placeholder="Search by request number"
         />
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th onClick={() => handleSort("id")}>
-              Request Number{" "}
-              {sortConfig.key === "id"
-                ? sortConfig.direction === "asc"
-                  ? "↑"
-                  : "↓"
-                : null}
-            </th>
-            <th onClick={() => handleSort("status")}>
-              Status{" "}
-              {sortConfig.key === "status"
-                ? sortConfig.direction === "asc"
-                  ? "↑"
-                  : "↓"
-                : null}
-            </th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredRequests.map((request) => (
-            <tr key={request.id}>
-              <td>{request.id}</td>
-              <td>{request.status}</td>
-              <td>
-                <button onClick={() => handleViewDetails(request)}>
-                  View Details
-                </button>
-              </td>
+
+      <div className="employeeList">
+        <table>
+          <thead>
+            <tr>
+              <th onClick={() => handleSort("id")}>
+                Request Number{" "}
+                {sortConfig.key === "id"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : null}
+              </th>
+              <th onClick={() => handleSort("status")}>
+                Status{" "}
+                {sortConfig.key === "status"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : null}
+              </th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredRequests.map((request) => (
+              <tr key={request.id}>
+                <td>{request.id}</td>
+                <td>{request.status}</td>
+                <td>
+                  <button
+                    className="btn"
+                    onClick={() => handleViewDetails(request)}
+                  >
+                    View Details
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       {selectedRequest && (
         <div>
           <h2>Request Details</h2>
           <p>Request Number: {selectedRequest.id}</p>
           <p>Status: {selectedRequest.status}</p>
           <textarea
+            className="input"
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             placeholder="Comment"
           />
-          <button onClick={handleApprove}>Approve</button>
-          <button onClick={handleReject}>Reject</button>
-          <button onClick={() => setSelectedRequest(null)}>Close</button>
+          <button className="btn" onClick={handleApprove}>
+            Approve
+          </button>
+          <button className="btn" onClick={handleReject}>
+            Reject
+          </button>
+          <button className="btn" onClick={() => setSelectedRequest(null)}>
+            Close
+          </button>
         </div>
       )}
     </div>

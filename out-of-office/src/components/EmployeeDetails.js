@@ -91,8 +91,8 @@ const EmployeeDetails = ({ employeeId, onClose }) => {
           </option>
         ))}
       </select>
-      <button onClick={handleAssignProject}>Assign Project</button>
-      <button onClick={onClose}>Close</button>
+      <button className="btn" onClick={handleAssignProject}>Assign Project</button>
+      <button className="btn" onClick={onClose}>Close</button>
     </div>
   );
 };

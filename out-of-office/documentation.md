@@ -1,3 +1,50 @@
+Creator Jakub Pawlik
+
+
+The project was made using React with postgresql database
+
+the backend of the app is placed in index.js file in backend folder
+
+to run this program the user needs to have postgresql installed, or if you're using a different database some changes will probably be needed.
+
+before running the app, it would be best to run npm init to make sure all packages are installed
+
+the application out of office focuses on making it easier for the employees and managers to manage adding new employees, projects, and managing employee's leave requests.
+
+Users can access their information in the employees tab, for normal employees ther's  just some personal data, however the HR and PMs can view all employees
+
+in requests tab, users can add new leave requests, when that happens there is an approval request automatically generated and upon approving or rejecting, the leave request's status changes
+
+in projects tab the project manager can add, edit and deactivate projects, other employees can view the details of the projects assigned to them.
+
+
+Below are screenshots taken in the application
+
+![alt text](screenshots/img1.png)
+Login screen
+
+
+![alt text](screenshots/img2.png)
+Employees screen
+
+![alt text](screenshots/img3.png)
+Leave Requests screen - Adding new request
+
+![alt text](screenshots/img4.png)
+Approval requests screen - rejecting request
+
+
+![alt text](screenshots/img5.png)
+Leave Requests - showing rejected request
+
+
+![alt text](screenshots/img6.png)
+Projects screen
+
+
+
+To create the tables used in the app, please use commands below
+
 CREATE TABLE employees (
     id SERIAL PRIMARY KEY,
     full_name VARCHAR(255) NOT NULL,
@@ -59,6 +106,8 @@ CREATE TABLE employee_projects (
 
 drop table employee_projects, projects, approval_requests, leave_requests, employees;
 
+
+To run the app, you need to run these commands, one runs the frontend app, the other, backend
+
 npm start
 npm run serve
-

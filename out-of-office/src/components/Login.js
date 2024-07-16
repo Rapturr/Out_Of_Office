@@ -43,7 +43,9 @@ function Login({ setUser }) {
           />
           <i></i>
         </div>
-        <button type="submit">Login</button>
+        <button type="submit" className="btn">
+          Login
+        </button>
       </form>
     </div>
   );

@@ -113,65 +113,10 @@ const ProjectList = ({ Loggeduser }) => {
             placeholder="Search by project number"
           />
         </div>
-        <table>
-          <thead>
-            <tr>
-              <th onClick={() => handleSort("project_type")}>
-                project_type{" "}
-                {sortConfig.key === "project_type"
-                  ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
-                  : null}
-              </th>
-              <th onClick={() => handleSort("start_date")}>
-                start_date{" "}
-                {sortConfig.key === "start_date"
-                  ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
-                  : null}
-              </th>
-              <th>End Date</th>
-              <th onClick={() => handleSort("project_manager")}>
-                project_manager{" "}
-                {sortConfig.key === "project_manager"
-                  ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
-                  : null}
-              </th>
-              <th>comment</th>
-              <th>status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredProjects.map((project) => (
-              <tr key={project.id}>
-                <td>{project.project_type}</td>
-                <td>{project.start_date}</td>
-                <td>{project.end_date}</td>
-                <td>{project.project_manager}</td>
-                <td>{project.comment}</td>
-                <td>{project.status}</td>
-                <td>
-                  <button onClick={() => handleEditProject(project)}>
-                    Edit
-                  </button>
-                  <button onClick={() => handleDeactivateProject(project.id)}>
-                    Deactivate
-                  </button>
-                  <button onClick={() => handleViewDetails(project.id)}>
-                    View Details
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+
         <div>
           <h2>{editingId ? "Edit Project" : "Add Project"}</h2>
-          <form>
+          <form className="edit-horizontal">
             <input
               name="project_type"
               value={form.project_type}
@@ -200,6 +145,7 @@ const ProjectList = ({ Loggeduser }) => {
             />
             <textarea
               name="comment"
+              className="input"
               value={form.comment}
               onChange={handleFormChange}
               placeholder="comment"
@@ -210,11 +156,84 @@ const ProjectList = ({ Loggeduser }) => {
               onChange={handleFormChange}
               placeholder="status"
             />
-            <button type="button" onClick={handleAddOrUpdateProject}>
+            <button
+              className="btn"
+              type="button"
+              onClick={handleAddOrUpdateProject}
+            >
               {editingId ? "Update" : "Add"}
             </button>
           </form>
         </div>
+
+        <div className="projectList">
+          <table>
+            <thead>
+              <tr>
+                <th onClick={() => handleSort("project_type")}>
+                  project_type{" "}
+                  {sortConfig.key === "project_type"
+                    ? sortConfig.direction === "asc"
+                      ? "↑"
+                      : "↓"
+                    : null}
+                </th>
+                <th onClick={() => handleSort("start_date")}>
+                  start_date{" "}
+                  {sortConfig.key === "start_date"
+                    ? sortConfig.direction === "asc"
+                      ? "↑"
+                      : "↓"
+                    : null}
+                </th>
+                <th>End Date</th>
+                <th onClick={() => handleSort("project_manager")}>
+                  project_manager{" "}
+                  {sortConfig.key === "project_manager"
+                    ? sortConfig.direction === "asc"
+                      ? "↑"
+                      : "↓"
+                    : null}
+                </th>
+                <th>comment</th>
+                <th>status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredProjects.map((project) => (
+                <tr key={project.id}>
+                  <td>{project.project_type}</td>
+                  <td>{project.start_date}</td>
+                  <td>{project.end_date}</td>
+                  <td>{project.project_manager}</td>
+                  <td>{project.comment}</td>
+                  <td>{project.status}</td>
+                  <td>
+                    <button
+                      className="btn"
+                      onClick={() => handleEditProject(project)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="btn"
+                      onClick={() => handleDeactivateProject(project.id)}
+                    >
+                      Deactivate
+                    </button>
+                    <button
+                      className="btn"
+                      onClick={() => handleViewDetails(project.id)}
+                    >
+                      View Details
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
         {selectedProject && (
           <ProjectDetails
             project={selectedProject}
@@ -233,59 +252,64 @@ const ProjectList = ({ Loggeduser }) => {
           <input
             type="text"
             onChange={inputHandler}
-            placeholder="Search by project number"
+            placeholder="Search by project type"
           />
         </div>
-        <table>
-          <thead>
-            <tr>
-              <th onClick={() => handleSort("project_type")}>
-                project_type{" "}
-                {sortConfig.key === "project_type"
-                  ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
-                  : null}
-              </th>
-              <th onClick={() => handleSort("start_date")}>
-                start_date{" "}
-                {sortConfig.key === "start_date"
-                  ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
-                  : null}
-              </th>
-              <th>End Date</th>
-              <th onClick={() => handleSort("project_manager")}>
-                project_manager{" "}
-                {sortConfig.key === "project_manager"
-                  ? sortConfig.direction === "asc"
-                    ? "↑"
-                    : "↓"
-                  : null}
-              </th>
-              <th>comment</th>
-              <th>status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredProjects.map((project) => (
-              <tr key={project.id}>
-                <td>{project.project_type}</td>
-                <td>{project.start_date}</td>
-                <td>{project.end_date}</td>
-                <td>{project.project_manager}</td>
-                <td>{project.comment}</td>
-                <td>{project.status}</td>
-                <td>
-                  <button onClick={() => handleViewDetails(project.id)}>
-                    View Details
-                  </button>
-                </td>
+        <div className="projectList">
+          <table>
+            <thead>
+              <tr>
+                <th onClick={() => handleSort("project_type")}>
+                  project_type{" "}
+                  {sortConfig.key === "project_type"
+                    ? sortConfig.direction === "asc"
+                      ? "↑"
+                      : "↓"
+                    : null}
+                </th>
+                <th onClick={() => handleSort("start_date")}>
+                  start_date{" "}
+                  {sortConfig.key === "start_date"
+                    ? sortConfig.direction === "asc"
+                      ? "↑"
+                      : "↓"
+                    : null}
+                </th>
+                <th>End Date</th>
+                <th onClick={() => handleSort("project_manager")}>
+                  project_manager{" "}
+                  {sortConfig.key === "project_manager"
+                    ? sortConfig.direction === "asc"
+                      ? "↑"
+                      : "↓"
+                    : null}
+                </th>
+                <th>comment</th>
+                <th>status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredProjects.map((project) => (
+                <tr key={project.id}>
+                  <td>{project.project_type}</td>
+                  <td>{project.start_date}</td>
+                  <td>{project.end_date}</td>
+                  <td>{project.project_manager}</td>
+                  <td>{project.comment}</td>
+                  <td>{project.status}</td>
+                  <td>
+                    <button
+                      className="btn"
+                      onClick={() => handleViewDetails(project.id)}
+                    >
+                      View Details
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         <div></div>
         {selectedProject && (
           <ProjectDetails
@@ -307,7 +331,9 @@ const ProjectDetails = ({ project, onClose }) => {
       <p>project_manager: {project.project_manager}</p>
       <p>comment: {project.comment}</p>
       <p>Status: {project.status}</p>
-      <button onClick={onClose}>Close</button>
+      <button className="btn" onClick={onClose}>
+        Close
+      </button>
     </div>
   );
 };

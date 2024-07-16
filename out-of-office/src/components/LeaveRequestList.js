@@ -134,7 +134,9 @@ const LeaveRequestList = ({ Loggeduser }) => {
           placeholder="Search by reason"
         />
       </div>
-      <form className="edit"
+      <h2>Add new request</h2>
+      <form
+        className="edit-horizontal"
         onSubmit={(e) => {
           e.preventDefault();
           handleAddOrUpdateRequest();
@@ -169,62 +171,69 @@ const LeaveRequestList = ({ Loggeduser }) => {
           onChange={handleChange}
           placeholder="Comment"
         />
-        <button type="submit">Submit</button>
+        <button className="btn" type="submit">
+          Submit
+        </button>
       </form>
-      <table>
-        <thead>
-          <tr>
-            <th onClick={() => handleSort("absence_reason")}>
-              Absence Reason{" "}
-              {sortConfig.key === "absence_reason"
-                ? sortConfig.direction === "asc"
-                  ? "↑"
-                  : "↓"
-                : null}
-            </th>
-            <th onClick={() => handleSort("start_date")}>
-              Start Date{" "}
-              {sortConfig.key === "start_date"
-                ? sortConfig.direction === "asc"
-                  ? "↑"
-                  : "↓"
-                : null}
-            </th>
-            <th onClick={() => handleSort("end_date")}>
-              End Date{" "}
-              {sortConfig.key === "end_date"
-                ? sortConfig.direction === "asc"
-                  ? "↑"
-                  : "↓"
-                : null}
-            </th>
-            <th onClick={() => handleSort("status")}>
-              Status{" "}
-              {sortConfig.key === "status"
-                ? sortConfig.direction === "asc"
-                  ? "↑"
-                  : "↓"
-                : null}
-            </th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredRequests.map((request) => (
-            <tr key={request.id}>
-              <td>{request.absence_reason}</td>
-              <td>{request.start_date}</td>
-              <td>{request.end_date}</td>
-              <td>{request.status}</td>
-              <td>
-                <button onClick={() => handleViewDetails(request.id)}>
-                  View Details
-                </button>
-              </td>
+      <div className="employeeList">
+        <table>
+          <thead>
+            <tr>
+              <th onClick={() => handleSort("absence_reason")}>
+                Absence Reason{" "}
+                {sortConfig.key === "absence_reason"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : null}
+              </th>
+              <th onClick={() => handleSort("start_date")}>
+                Start Date{" "}
+                {sortConfig.key === "start_date"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : null}
+              </th>
+              <th onClick={() => handleSort("end_date")}>
+                End Date{" "}
+                {sortConfig.key === "end_date"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : null}
+              </th>
+              <th onClick={() => handleSort("status")}>
+                Status{" "}
+                {sortConfig.key === "status"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : null}
+              </th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredRequests.map((request) => (
+              <tr key={request.id}>
+                <td>{request.absence_reason}</td>
+                <td>{request.start_date}</td>
+                <td>{request.end_date}</td>
+                <td>{request.status}</td>
+                <td>
+                  <button
+                    className="btn"
+                    onClick={() => handleViewDetails(request.id)}
+                  >
+                    View Details
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       {selectedRequest && (
         <RequestDetails
           request={selectedRequest}
@@ -245,8 +254,12 @@ const RequestDetails = ({ request, onClose, onCancel }) => {
       <p>Start Date: {request.start_date}</p>
       <p>End Date: {request.end_date}</p>
       <p>Comment: {request.comment}</p>
-      <button onClick={onClose}>Close</button>
-      <button onClick={onCancel}>Cancel Request</button>
+      <button className="btn" onClick={onClose}>
+        Close
+      </button>
+      <button className="btn" onClick={onCancel}>
+        Cancel Request
+      </button>
     </div>
   );
 };
