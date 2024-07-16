@@ -19,14 +19,20 @@ const ProjectList = ({ Loggeduser }) => {
   const [editingId, setEditingId] = useState(null);
   const navigate = useNavigate();
 
-
   const fetchProjects = async () => {
     const result = await axios.get("http://localhost:5000/api/projects");
     setProjects(result.data);
   };
+  const fetchPersonalProjects = async () => {
+    const result = await axios.get(
+      `http://localhost:5000/api/employee-projects/${Loggeduser}`
+    );
+    setProjects(result.data);
+  };
 
   useEffect(() => {
-    fetchProjects();
+    if (Loggeduser == 1 || Loggeduser == 2) fetchProjects();
+    else fetchPersonalProjects();
   }, []);
 
   const inputHandler = (e) => {
@@ -93,126 +99,201 @@ const ProjectList = ({ Loggeduser }) => {
     setSelectedProject(result.data);
   };
 
-  return (
-    <div>
-      <Navigator />
-      
-      <h1>Projects</h1>
-      <div className="search">
-        <input
-          type="text"
-          onChange={inputHandler}
-          placeholder="Search by project number"
-        />
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th onClick={() => handleSort("project_type")}>
-              project_type{" "}
-              {sortConfig.key === "project_type"
-                ? sortConfig.direction === "asc"
-                  ? "↑"
-                  : "↓"
-                : null}
-            </th>
-            <th onClick={() => handleSort("start_date")}>
-              start_date{" "}
-              {sortConfig.key === "start_date"
-                ? sortConfig.direction === "asc"
-                  ? "↑"
-                  : "↓"
-                : null}
-            </th>
-            <th>End Date</th>
-            <th onClick={() => handleSort("project_manager")}>
-              project_manager{" "}
-              {sortConfig.key === "project_manager"
-                ? sortConfig.direction === "asc"
-                  ? "↑"
-                  : "↓"
-                : null}
-            </th>
-            <th>comment</th>
-            <th>status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredProjects.map((project) => (
-            <tr key={project.id}>
-              <td>{project.project_type}</td>
-              <td>{project.start_date}</td>
-              <td>{project.end_date}</td>
-              <td>{project.project_manager}</td>
-              <td>{project.comment}</td>
-              <td>{project.status}</td>
-              <td>
-                <button onClick={() => handleEditProject(project)}>Edit</button>
-                <button onClick={() => handleDeactivateProject(project.id)}>
-                  Deactivate
-                </button>
-                <button onClick={() => handleViewDetails(project.id)}>
-                  View Details
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+  if (Loggeduser == 1 || Loggeduser == 2)
+    return (
       <div>
-        <h2>{editingId ? "Edit Project" : "Add Project"}</h2>
-        <form>
+        <Navigator />
+
+        <h1>Projects</h1>
+        <div className="search">
           <input
-            name="project_type"
-            value={form.project_type}
-            onChange={handleFormChange}
-            placeholder="Project Type"
+            type="text"
+            onChange={inputHandler}
+            placeholder="Search by project number"
           />
-          <input
-            name="start_date"
-            value={form.start_date}
-            onChange={handleFormChange}
-            placeholder="Start Date"
-            type="date"
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th onClick={() => handleSort("project_type")}>
+                project_type{" "}
+                {sortConfig.key === "project_type"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : null}
+              </th>
+              <th onClick={() => handleSort("start_date")}>
+                start_date{" "}
+                {sortConfig.key === "start_date"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : null}
+              </th>
+              <th>End Date</th>
+              <th onClick={() => handleSort("project_manager")}>
+                project_manager{" "}
+                {sortConfig.key === "project_manager"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : null}
+              </th>
+              <th>comment</th>
+              <th>status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredProjects.map((project) => (
+              <tr key={project.id}>
+                <td>{project.project_type}</td>
+                <td>{project.start_date}</td>
+                <td>{project.end_date}</td>
+                <td>{project.project_manager}</td>
+                <td>{project.comment}</td>
+                <td>{project.status}</td>
+                <td>
+                  <button onClick={() => handleEditProject(project)}>
+                    Edit
+                  </button>
+                  <button onClick={() => handleDeactivateProject(project.id)}>
+                    Deactivate
+                  </button>
+                  <button onClick={() => handleViewDetails(project.id)}>
+                    View Details
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div>
+          <h2>{editingId ? "Edit Project" : "Add Project"}</h2>
+          <form>
+            <input
+              name="project_type"
+              value={form.project_type}
+              onChange={handleFormChange}
+              placeholder="Project Type"
+            />
+            <input
+              name="start_date"
+              value={form.start_date}
+              onChange={handleFormChange}
+              placeholder="Start Date"
+              type="date"
+            />
+            <input
+              name="end_date"
+              value={form.end_date}
+              onChange={handleFormChange}
+              placeholder="End Date"
+              type="date"
+            />
+            <input
+              name="project_manager"
+              value={form.project_manager}
+              onChange={handleFormChange}
+              placeholder="project_manager"
+            />
+            <textarea
+              name="comment"
+              value={form.comment}
+              onChange={handleFormChange}
+              placeholder="comment"
+            ></textarea>
+            <input
+              name="status"
+              value={form.status}
+              onChange={handleFormChange}
+              placeholder="status"
+            />
+            <button type="button" onClick={handleAddOrUpdateProject}>
+              {editingId ? "Update" : "Add"}
+            </button>
+          </form>
+        </div>
+        {selectedProject && (
+          <ProjectDetails
+            project={selectedProject}
+            onClose={() => setSelectedProject(null)}
           />
-          <input
-            name="end_date"
-            value={form.end_date}
-            onChange={handleFormChange}
-            placeholder="End Date"
-            type="date"
-          />
-          <input
-            name="project_manager"
-            value={form.project_manager}
-            onChange={handleFormChange}
-            placeholder="project_manager"
-          />
-          <textarea
-            name="comment"
-            value={form.comment}
-            onChange={handleFormChange}
-            placeholder="comment"
-          ></textarea>
-          <input
-            name="status"
-            value={form.status}
-            onChange={handleFormChange}
-            placeholder="status"
-          />
-          <button type="button" onClick={handleAddOrUpdateProject}>
-            {editingId ? "Update" : "Add"}
-          </button>
-        </form>
+        )}
       </div>
-      {selectedProject && (
-        <ProjectDetails
-          project={selectedProject}
-          onClose={() => setSelectedProject(null)}
-        />
-      )}
-    </div>
-  );
+    );
+  else
+    return (
+      <div>
+        <Navigator />
+
+        <h1>Projects</h1>
+        <div className="search">
+          <input
+            type="text"
+            onChange={inputHandler}
+            placeholder="Search by project number"
+          />
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th onClick={() => handleSort("project_type")}>
+                project_type{" "}
+                {sortConfig.key === "project_type"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : null}
+              </th>
+              <th onClick={() => handleSort("start_date")}>
+                start_date{" "}
+                {sortConfig.key === "start_date"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : null}
+              </th>
+              <th>End Date</th>
+              <th onClick={() => handleSort("project_manager")}>
+                project_manager{" "}
+                {sortConfig.key === "project_manager"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : null}
+              </th>
+              <th>comment</th>
+              <th>status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredProjects.map((project) => (
+              <tr key={project.id}>
+                <td>{project.project_type}</td>
+                <td>{project.start_date}</td>
+                <td>{project.end_date}</td>
+                <td>{project.project_manager}</td>
+                <td>{project.comment}</td>
+                <td>{project.status}</td>
+                <td>
+                  <button onClick={() => handleViewDetails(project.id)}>
+                    View Details
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div></div>
+        {selectedProject && (
+          <ProjectDetails
+            project={selectedProject}
+            onClose={() => setSelectedProject(null)}
+          />
+        )}
+      </div>
+    );
 };
 
 const ProjectDetails = ({ project, onClose }) => {

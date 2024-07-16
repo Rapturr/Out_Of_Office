@@ -21,9 +21,14 @@ const LeaveRequestList = ({ Loggeduser }) => {
 
   const fetchRequests = async () => {
     try {
-      const result = await axios.get(
-        `http://localhost:5000/api/personal-leave-requests/${Loggeduser}`
-      );
+      let result;
+      if (Loggeduser == 1 || Loggeduser == 2) {
+        result = await axios.get(`http://localhost:5000/api/leave-requests`);
+      } else {
+        result = await axios.get(
+          `http://localhost:5000/api/personal-leave-requests/${Loggeduser}`
+        );
+      }
       setRequests(result.data);
     } catch (error) {
       console.error("Error fetching leave requests:", error);
@@ -73,6 +78,21 @@ const LeaveRequestList = ({ Loggeduser }) => {
         comment: "",
         status: "new",
       });
+      setSelectedRequest(null);
+    } catch (error) {
+      console.error("Error adding/updating leave request:", error);
+    }
+  };
+
+  const onCancel = async () => {
+    try {
+      console.log("DBG");
+      await axios.put(
+        `http://localhost:5000/api/leave-requests/${selectedRequest.id}/cancel`
+      );
+      console.log("DBG-2");
+
+      fetchRequests();
       setSelectedRequest(null);
     } catch (error) {
       console.error("Error adding/updating leave request:", error);
@@ -209,13 +229,14 @@ const LeaveRequestList = ({ Loggeduser }) => {
         <RequestDetails
           request={selectedRequest}
           onClose={() => setSelectedRequest(null)}
+          onCancel={onCancel}
         />
       )}
     </div>
   );
 };
 
-const RequestDetails = ({ request, onClose }) => {
+const RequestDetails = ({ request, onClose, onCancel }) => {
   return (
     <div>
       <h2>Request Details</h2>
@@ -225,6 +246,7 @@ const RequestDetails = ({ request, onClose }) => {
       <p>End Date: {request.end_date}</p>
       <p>Comment: {request.comment}</p>
       <button onClick={onClose}>Close</button>
+      <button onClick={onCancel}>Cancel Request</button>
     </div>
   );
 };

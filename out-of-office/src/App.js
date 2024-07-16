@@ -7,6 +7,7 @@ import LeaveRequestList from "./components/LeaveRequestList";
 import ProjectList from "./components/ProjectList";
 import Login from "./components/Login";
 import { useNavigate } from "react-router-dom";
+import Navigator from "./components/Navigator";
 
 function App() {
   const [user, setUser] = useState(null);

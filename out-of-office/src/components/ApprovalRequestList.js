@@ -2,26 +2,26 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Navigator from "./Navigator";
 
-const ApprovalRequestList = ({ Loggeduser }) => {
+const ApprovalRequests = ({ Loggeduser }) => {
   const [requests, setRequests] = useState([]);
-  const [inputText, setInputText] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+  const [inputText, setInputText] = useState("");
   const [selectedRequest, setSelectedRequest] = useState(null);
- 
-
-  const fetchRequests = async () => {
-    const result = await axios.get(
-      "http://localhost:5000/api/approval-requests"
-    );
-    setRequests(result.data);
-  };
+  const [comment, setComment] = useState("");
 
   useEffect(() => {
     fetchRequests();
   }, []);
 
-  const inputHandler = (e) => {
-    setInputText(e.target.value.toLowerCase());
+  const fetchRequests = async () => {
+    try {
+      const result = await axios.get(
+        "http://localhost:5000/api/approval-requests"
+      );
+      setRequests(result.data);
+    } catch (error) {
+      console.error("Error fetching approval requests:", error);
+    }
   };
 
   const handleSort = (key) => {
@@ -43,105 +43,117 @@ const ApprovalRequestList = ({ Loggeduser }) => {
   });
 
   const filteredRequests = sortedRequests.filter((request) =>
-    request.request_number.toLowerCase().includes(inputText)
+    request.id.toString().includes(inputText)
   );
 
   const handleViewDetails = (request) => {
     setSelectedRequest(request);
+    setComment(request.comment || "");
   };
 
-  const handleApproveRequest = async (id) => {
-    await axios.put(
-      `http://localhost:5000/api/approval-requests/${id}/approve`
-    );
-    fetchRequests();
-  };
-
-  const handleRejectRequest = async (id) => {
-    const comment = prompt("Enter a comment for rejection:");
-    if (comment) {
+  const handleApprove = async () => {
+    try {
       await axios.put(
-        `http://localhost:5000/api/approval-requests/${id}/reject`,
-        { comment }
+        `http://localhost:5000/api/approval-requests/${selectedRequest.id}`,
+        {
+          status: "Approved",
+          comment,
+        }
       );
       fetchRequests();
+      setSelectedRequest(null);
+    } catch (error) {
+      console.error("Error approving request:", error);
     }
   };
 
-  return (
-    <div>
-      <Navigator />
-      
-      <h1>Approval Requests</h1>
-      <div className="search">
-        <input
-          type="text"
-          onChange={inputHandler}
-          placeholder="Search by request number"
-        />
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th onClick={() => handleSort("request_number")}>
-              Request Number{" "}
-              {sortConfig.key === "request_number"
-                ? sortConfig.direction === "asc"
-                  ? "↑"
-                  : "↓"
-                : null}
-            </th>
-            <th onClick={() => handleSort("status")}>
-              Status{" "}
-              {sortConfig.key === "status"
-                ? sortConfig.direction === "asc"
-                  ? "↑"
-                  : "↓"
-                : null}
-            </th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredRequests.map((request) => (
-            <tr key={request.id}>
-              <td>{request.request_number}</td>
-              <td>{request.status}</td>
-              <td>
-                <button onClick={() => handleViewDetails(request)}>
-                  View Details
-                </button>
-                <button onClick={() => handleApproveRequest(request.id)}>
-                  Approve
-                </button>
-                <button onClick={() => handleRejectRequest(request.id)}>
-                  Reject
-                </button>
-              </td>
+  const handleReject = async () => {
+    try {
+      await axios.put(
+        `http://localhost:5000/api/approval-requests/${selectedRequest.id}`,
+        {
+          status: "Rejected",
+          comment,
+        }
+      );
+      fetchRequests();
+      setSelectedRequest(null);
+    } catch (error) {
+      console.error("Error rejecting request:", error);
+    }
+  };
+  if (Loggeduser == 1 || Loggeduser == 2)
+    return (
+      <div>
+        <Navigator />
+        <h1>Approval Requests</h1>
+        <div className="search">
+          <input
+            type="text"
+            onChange={(e) => setInputText(e.target.value.toLowerCase())}
+            placeholder="Search by request number"
+          />
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th onClick={() => handleSort("id")}>
+                Request Number{" "}
+                {sortConfig.key === "id"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : null}
+              </th>
+              <th onClick={() => handleSort("status")}>
+                Status{" "}
+                {sortConfig.key === "status"
+                  ? sortConfig.direction === "asc"
+                    ? "↑"
+                    : "↓"
+                  : null}
+              </th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-      {selectedRequest && (
-        <RequestDetails
-          request={selectedRequest}
-          onClose={() => setSelectedRequest(null)}
-        />
-      )}
-    </div>
-  );
+          </thead>
+          <tbody>
+            {filteredRequests.map((request) => (
+              <tr key={request.id}>
+                <td>{request.id}</td>
+                <td>{request.status}</td>
+                <td>
+                  <button onClick={() => handleViewDetails(request)}>
+                    View Details
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {selectedRequest && (
+          <div>
+            <h2>Request Details</h2>
+            <p>Request Number: {selectedRequest.id}</p>
+            <p>Status: {selectedRequest.status}</p>
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Comment"
+            />
+            <button onClick={handleApprove}>Approve</button>
+            <button onClick={handleReject}>Reject</button>
+            <button onClick={() => setSelectedRequest(null)}>Close</button>
+          </div>
+        )}
+      </div>
+    );
+  else {
+    return (
+      <div>
+        <Navigator />
+      </div>
+    );
+  }
 };
 
-const RequestDetails = ({ request, onClose }) => {
-  return (
-    <div>
-      <h2>Request Details</h2>
-      <p>Request Number: {request.request_number}</p>
-      <p>Status: {request.status}</p>
-      <p>Comment: {request.comment}</p>
-      <button onClick={onClose}>Close</button>
-    </div>
-  );
-};
-
-export default ApprovalRequestList;
+export default ApprovalRequests;

@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-function Navigator({ setUser }) {
+function Navigator() {
   const navigate = useNavigate();
 
   const navto = (dest) => {
     navigate(dest);
   };
-
   return (
     <div>
       <nav>

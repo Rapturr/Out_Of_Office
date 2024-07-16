@@ -174,6 +174,18 @@ app.get("/api/projects/:id", async (req, res) => {
   }
 });
 
+app.get("/api/employee-projects/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      "SELECT * FROM projects LEFT JOIN employee_projects ON employee_projects.project_id = projects.id WHERE employee_projects.employee_id = $1",
+      [id]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 // Add a new project
 app.post("/api/projects", async (req, res) => {
   const {
@@ -231,10 +243,11 @@ app.put("/api/projects/:id/deactivate", async (req, res) => {
 // Fetch all approval requests
 app.get("/api/approval-requests", async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM approval_requests");
-    res.json(result.rows);
+    const { rows } = await pool.query("SELECT * FROM approval_requests");
+    res.json(rows);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).send("Server error");
   }
 });
 
@@ -252,51 +265,36 @@ app.get("/api/approval-requests/:id", async (req, res) => {
   }
 });
 
-// Approve a request
-app.put("/api/approval-requests/:id/approve", async (req, res) => {
+// Approve or Reject a request
+app.put("/api/approval-requests/:id", async (req, res) => {
   const { id } = req.params;
+  const { status, comment, Loggeduser } = req.body;
+
   try {
-    const approvalResult = await pool.query(
-      "UPDATE approval_requests SET status = 'Approved' WHERE id = $1 RETURNING *",
-      [id]
-    );
-    const leaveRequestId = approvalResult.rows[0].leave_request_id;
-
-    await pool.query(
-      "UPDATE leave_requests SET status = 'Approved' WHERE id = $1",
-      [leaveRequestId]
+    const { rows } = await pool.query(
+      "UPDATE approval_requests SET status = $1, comment = $2 WHERE id = $3 RETURNING *",
+      [status, comment, id]
     );
 
-    // Recalculate employee absence balance (pseudo code)
-    // const employeeId = // fetch from leave_request by leaveRequestId
-    // const absenceBalance = // calculate new balance
-    // await pool.query("UPDATE employees SET absence_balance = $1 WHERE id = $2", [absenceBalance, employeeId]);
+    if (status === "Approved") {
+      const leaveRequestId = rows[0].leave_request;
+      await pool.query("UPDATE leave_requests SET status = $1 WHERE id = $2", [
+        "Approved",
+        leaveRequestId,
+      ]);
+      // Add logic to update employee absence balance if needed
+    } else if (status === "Rejected") {
+      const leaveRequestId = rows[0].leave_request;
+      await pool.query("UPDATE leave_requests SET status = $1 WHERE id = $2", [
+        "Rejected",
+        leaveRequestId,
+      ]);
+    }
 
-    res.json(approvalResult.rows[0]);
+    res.json(rows[0]);
   } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Reject a request
-app.put("/api/approval-requests/:id/reject", async (req, res) => {
-  const { id } = req.params;
-  const { comment } = req.body; // Expecting a comment in the request body
-  try {
-    const approvalResult = await pool.query(
-      "UPDATE approval_requests SET status = 'Rejected', comment = $1 WHERE id = $2 RETURNING *",
-      [comment, id]
-    );
-    const leaveRequestId = approvalResult.rows[0].leave_request_id;
-
-    await pool.query(
-      "UPDATE leave_requests SET status = 'Rejected' WHERE id = $1",
-      [leaveRequestId]
-    );
-
-    res.json(approvalResult.rows[0]);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).send("Server error");
   }
 });
 
@@ -335,29 +333,20 @@ app.post("/api/leave-requests", async (req, res) => {
       "INSERT INTO leave_requests (employee, absence_reason, start_date, end_date, comment, status) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
       [employee, absence_reason, start_date, end_date, comment, "new"]
     );
-    res.json(result.rows[0]);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-/*
-// Fetch personal leave requests
-app.get("/api/personal-leave-requests/:id", async (req, res) => {
-  try {
-    const result = await pool.query(
-      "SELECT * FROM leave_requests WHERE employee = 3"
+    const leaveRequestId = result.rows[0].id;
+    await pool.query(
+      "INSERT INTO approval_requests (approver, leave_request, status, comment) VALUES ($1, $2, $3, $4) RETURNING *",
+      [1, leaveRequestId, "new", ""]
     );
     res.json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
-*/
+
 // Get an employee's details
 app.get("/api/personal-leave-requests/:id", async (req, res) => {
   const { id } = req.params;
-  console.log("ID = ", id);
   try {
     const result = await pool.query(
       "SELECT * FROM leave_requests where employee = $1",
@@ -368,18 +357,17 @@ app.get("/api/personal-leave-requests/:id", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-/*
-app.get("/api/personal-leave-requests/:id", async (req, res) => {
+// Cancel a request
+app.put("/api/leave-requests/:id/cancel", async (req, res) => {
   const { id } = req.params;
-  console.log("User ", id);
+  console.log("ServeDBG1");
   try {
     const result = await pool.query(
-      "SELECT * FROM leave_requests where employee = $1",
-      [id]
+      "UPDATE leave_requests SET status = $1 WHERE id = $2",
+      ["Canceled", id]
     );
     res.json(result.rows);
-  } catch (err) {
+  } catch (error) {
     res.status(500).json({ error: err.message });
   }
 });
-*/
