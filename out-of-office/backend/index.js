@@ -265,6 +265,20 @@ app.get("/api/approval-requests/:id", async (req, res) => {
   }
 });
 
+// Fetch details of a specific request
+app.get("/api/personal-approval-requests/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      "SELECT * FROM approval_requests WHERE approver = $1",
+      [id]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Approve or Reject a request
 app.put("/api/approval-requests/:id", async (req, res) => {
   const { id } = req.params;
@@ -333,10 +347,15 @@ app.post("/api/leave-requests", async (req, res) => {
       "INSERT INTO leave_requests (employee, absence_reason, start_date, end_date, comment, status) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
       [employee, absence_reason, start_date, end_date, comment, "new"]
     );
+    const employeeResult = await pool.query(
+      "SELECT people_partner FROM employees WHERE id = $1",
+      [employee]
+    );
+    const peoplePartner = employeeResult.rows[0].people_partner;
     const leaveRequestId = result.rows[0].id;
     await pool.query(
       "INSERT INTO approval_requests (approver, leave_request, status, comment) VALUES ($1, $2, $3, $4) RETURNING *",
-      [1, leaveRequestId, "new", ""]
+      [peoplePartner, leaveRequestId, "new", ""]
     );
     res.json(result.rows[0]);
   } catch (err) {

@@ -16,7 +16,7 @@ const ApprovalRequests = ({ Loggeduser }) => {
   const fetchRequests = async () => {
     try {
       const result = await axios.get(
-        "http://localhost:5000/api/approval-requests"
+        `http://localhost:5000/api/personal-approval-requests/${Loggeduser}`
       );
       setRequests(result.data);
     } catch (error) {
